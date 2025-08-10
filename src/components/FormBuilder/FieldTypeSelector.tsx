@@ -1,17 +1,13 @@
 import React from "react";
-import { Box, Button, Grid } from "@mui/material"; // Only core MUI components here
-
-// Import icons individually from @mui/icons-material
+import { Button, Stack } from "@mui/material";
 import TextFieldsIcon from "@mui/icons-material/TextFields";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
-import TextareaAutosizeIcon from "@mui/icons-material/Notes"; // or pick any relevant icon
+import TextareaAutosizeIcon from "@mui/icons-material/Notes";
 import RadioButtonCheckedIcon from "@mui/icons-material/RadioButtonChecked";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import DateRangeIcon from "@mui/icons-material/DateRange";
-import { useAppDispatch } from "../../hooks/redux";
-import { addFormField } from "../../store/slices/formsSlice";
-import { v4 as uuidv4 } from "uuid";
-import { FormField } from "../../types/form.types";
+import { FieldType } from "../../types/form.types";
+import { CreateNewFieldModal } from "../Modal/Modal";
 
 // Define the available field types and their icons
 const fieldTypes: {
@@ -36,48 +32,36 @@ const fieldTypes: {
 ];
 
 const FieldTypeSelector: React.FC = () => {
-  const dispatch = useAppDispatch();
+  const [open, setOpen] = React.useState(false);
+  const [fieldType, setFieldType] = React.useState<FieldType | null>("text");
 
-  const handleAddField = (
-    type:
-      | "number"
-      | "text"
-      | "textarea"
-      | "select"
-      | "radio"
-      | "checkbox"
-      | "date"
-  ) => {
-    const newField: FormField = {
-      id: uuidv4(),
-      type,
-      label: "New " + type.charAt(0).toUpperCase() + type.slice(1) + " Field",
-      required: false,
-      validation: [],
-      isDerived: false,
-      options: type === "select" || type === "radio" ? ["Option 1"] : [],
-    };
-
-    dispatch(addFormField(newField));
+  const handleAddField = (type: FieldType) => {
+    setFieldType(type);
+    setOpen(true);
   };
 
   return (
-    <Box sx={{ p: 2, border: "1px dashed grey.400", borderRadius: 1 }}>
-      <Grid container spacing={1}>
+    <>
+      <Stack p={2} direction={"row"} gap={1} flexWrap={"wrap"}>
         {fieldTypes.map((fieldType) => (
-          <Grid key={fieldType.type}>
-            <Button
-              variant="outlined"
-              startIcon={fieldType.icon}
-              fullWidth
-              onClick={() => handleAddField(fieldType.type)}
-            >
-              {fieldType.label}
-            </Button>
-          </Grid>
+          <Button
+            sx={{ minWidth: "auto" }}
+            variant="outlined"
+            startIcon={fieldType.icon}
+            onClick={() => handleAddField(fieldType.type)}
+            key={fieldType.label}
+          >
+            {fieldType.label}
+          </Button>
         ))}
-      </Grid>
-    </Box>
+      </Stack>
+      <CreateNewFieldModal
+        open={open}
+        setOpen={setOpen}
+        fieldType={fieldType}
+        setFieldType={setFieldType}
+      />
+    </>
   );
 };
 

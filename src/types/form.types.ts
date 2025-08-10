@@ -1,5 +1,5 @@
 
-export type ValidationRuleType = 'required' | 'minLength' | 'maxLength' | 'email' | 'password' | 'custom';
+export type ValidationRuleType = 'minLength' | 'maxLength' | 'email' | 'password';
 
 export interface ValidationRule {
     type: ValidationRuleType;
@@ -7,15 +7,17 @@ export interface ValidationRule {
     message: string;
 }
 
+export type FieldType = 'text' | 'number' | 'textarea' | 'select' | 'radio' | 'checkbox' | 'date';
+
 // the structure of a single form field
 export interface FormField {
     id: string;
-    type: 'text' | 'number' | 'textarea' | 'select' | 'radio' | 'checkbox' | 'date';
+    type: FieldType;
     label: string;
     placeholder?: string;
     required: boolean;
     defaultValue?: any;
-    validation: ValidationRule[];
+    validations: ValidationRule[];
     isDerived: boolean;
     parentFields?: string[];
     derivedFormula?: string;
@@ -28,19 +30,4 @@ export interface Form {
     name: string;
     fields: FormField[];
     createdAt: string;
-}
-
-export interface FormField {
-    id: string;
-    type: 'text' | 'number' | 'textarea' | 'select' | 'radio' | 'checkbox' | 'date';
-    label: string;
-    placeholder?: string;
-    required: boolean;
-    defaultValue?: any;
-    validation: ValidationRule[];
-    // New properties for derived fields
-    isDerived: boolean;
-    parentFields?: string[];
-    derivedFormula?: string;
-    options?: string[];
 }

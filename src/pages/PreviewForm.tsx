@@ -1,6 +1,5 @@
-// src/pages/PreviewForm.tsx
 import React, { useEffect } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm, useWatch, ValidationRule } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { Box, Paper, Typography, Button } from "@mui/material"; // Removed TextField import
@@ -20,7 +19,7 @@ const createValidationSchema = (fields: FormField[]) => {
         "Passwords must match"
       );
     }
-    field.validation.forEach((rule) => {
+    field.validations.forEach((rule: any) => {
       switch (rule.type) {
         case "required":
           fieldSchema = fieldSchema.required(rule.message);

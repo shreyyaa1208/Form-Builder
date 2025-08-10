@@ -57,7 +57,7 @@ const CreateForm: React.FC = () => {
             </Button>
           </Grid>
         </Grid>
-        <Box sx={{ mt: 3 }}>
+        <Box>
           {/* This is the FormBuilder component where all the magic happens */}
           <FormBuilder />
         </Box>

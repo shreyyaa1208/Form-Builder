@@ -23,6 +23,8 @@ const FieldRenderer: React.FC<FieldRendererProps> = ({
   onClick,
   isSelected,
 }) => {
+  const [formValues, setFormValues] = React.useState<Record<string, any>>({});
+
   const renderField = () => {
     switch (field.type) {
       case "text":
@@ -34,6 +36,20 @@ const FieldRenderer: React.FC<FieldRendererProps> = ({
             label={field.label}
             type={field.type}
             variant="outlined"
+            required={field.required}
+            inputProps={{
+              "aria-label": field.label,
+              minLength: field.validations.find(
+                (rule) => rule.type === "minLength"
+              )?.value,
+              maxLength: field.validations.find(
+                (rule) => rule.type === "maxLength"
+              )?.value,
+            }}
+            onChange={(e) =>
+              setFormValues({ ...formValues, [field.id]: e.target.value })
+            }
+            value={formValues[field.id] || ""}
           />
         );
       case "textarea":
@@ -44,6 +60,20 @@ const FieldRenderer: React.FC<FieldRendererProps> = ({
             multiline
             rows={4}
             variant="outlined"
+            required={field.required}
+            inputProps={{
+              "aria-label": field.label,
+              minLength: field.validations.find(
+                (rule) => rule.type === "minLength"
+              )?.value,
+              maxLength: field.validations.find(
+                (rule) => rule.type === "maxLength"
+              )?.value,
+            }}
+            onChange={(e) =>
+              setFormValues({ ...formValues, [field.id]: e.target.value })
+            }
+            value={formValues[field.id] || ""}
           />
         );
       case "select":
@@ -51,8 +81,11 @@ const FieldRenderer: React.FC<FieldRendererProps> = ({
           <Select
             fullWidth
             label={field.label}
-            value={field.options?.[0] || ""}
             variant="outlined"
+            onChange={(e) =>
+              setFormValues({ ...formValues, [field.id]: e.target.value })
+            }
+            value={formValues[field.id] || ""}
           >
             {field.options?.map((option, index) => (
               <MenuItem key={index} value={option}>
@@ -85,22 +118,26 @@ const FieldRenderer: React.FC<FieldRendererProps> = ({
   };
 
   return (
-    <Box
-      sx={{
-        p: 2,
-        mb: 2,
-        border: "1px solid",
-        borderColor: isSelected ? "primary.main" : "grey.300",
-        borderRadius: 1,
-        cursor: "pointer",
-        "&:hover": {
-          boxShadow: 2,
-        },
-      }}
-      onClick={() => onClick && onClick(field.id)}
-    >
-      {renderField()}
-    </Box>
+    // <Box
+    //   sx={{
+    //     p: 2,
+    //     mb: 2,
+    //     border: "1px solid",
+    //     borderColor: isSelected ? "primary.main" : "grey.300",
+    //     borderRadius: 1,
+    //     cursor: "pointer",
+    //     "&:hover": {
+    //       boxShadow: 2,
+    //     },
+    //   }}
+    //   // onClick={() => onClick && onClick(field.id)}
+    //   onClick={(e) => {
+    //     const input = e.currentTarget.querySelector("input, textarea, select") as HTMLElement;
+    //     input?.focus();
+    //   }}
+    // >
+    <>{renderField()}</>
+    // </Box>
   );
 };
 

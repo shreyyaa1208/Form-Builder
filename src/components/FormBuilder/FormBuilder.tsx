@@ -6,7 +6,6 @@ import {
   useSensors,
   PointerSensor,
   DragEndEvent,
-  UniqueIdentifier,
 } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -17,21 +16,28 @@ import {
   restrictToVerticalAxis,
   restrictToWindowEdges,
 } from "@dnd-kit/modifiers";
-import { Box, Grid, Typography } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import { useAppSelector, useAppDispatch } from "../../hooks/redux";
 import { reorderFields } from "../../store/slices/formsSlice";
 import { FormField } from "../../types/form.types";
 
 import FieldRenderer from "./FieldRenderer";
 import { SortableItem } from "./SortableItem";
-import FieldConfigPanel from "./FieldConfigPanel";
 import FieldTypeSelector from "./FieldTypeSelector";
 
 const FormBuilder = () => {
   const dispatch = useAppDispatch();
   const fields = useAppSelector((state) => state.forms.currentForm.fields);
   const [selectedField, setSelectedField] = useState<FormField | null>(null);
-  const sensors = useSensors(useSensor(PointerSensor));
+  // const sensors = useSensors(useSensor(PointerSensor));
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        delay: 150,
+        tolerance: 5,
+      },
+    })
+  );
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -55,16 +61,24 @@ const FormBuilder = () => {
   };
 
   return (
-    <Grid container spacing={3}>
-      {/* Left Column: Form Builder and Field Selector */}
-      <Grid>
+    <Stack spacing={3} margin={0} padding={" 20px 0 "}>
+      <Box>
+        <Box>
+          <Typography variant="h6" gutterBottom>
+            Add New Field
+          </Typography>
+          <FieldTypeSelector />
+        </Box>
         <Typography variant="h6" gutterBottom>
           Form Fields
         </Typography>
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
-          // onDragStart={({ active }) => setSelectedField(active.data.current)}
+          onDragStart={({ active }) => {
+            console.log("Drag started for field:", active.data.current);
+            // setSelectedField(active.data.current);
+          }}
           onDragEnd={handleDragEnd}
           modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}
         >
@@ -72,42 +86,37 @@ const FormBuilder = () => {
             items={fields}
             strategy={verticalListSortingStrategy}
           >
-            {fields.map((field) => (
-              <SortableItem key={field.id} id={field.id}>
-                <FieldRenderer
-                  field={field}
-                  onClick={() => handleSelectField(field)}
-                  isSelected={field.id === selectedField?.id}
-                />
-              </SortableItem>
-            ))}
+            <Stack gap={2}>
+              {fields.map((field) => (
+                <SortableItem key={field.id} id={field.id}>
+                  <FieldRenderer
+                    field={field}
+                    onClick={() => handleSelectField(field)}
+                    isSelected={field.id === selectedField?.id}
+                  />
+                </SortableItem>
+              ))}
+            </Stack>
           </SortableContext>
         </DndContext>
-        <Box sx={{ mt: 3 }}>
-          <Typography variant="h6" gutterBottom>
-            Add New Field
-          </Typography>
-          <FieldTypeSelector />
-        </Box>
-      </Grid>
-
-      {/* Right Column: Field Configuration Panel */}
-      <Grid>
-        {selectedField ? (
+      </Box>
+      <Box>
+        {/* {selectedField ? (
           <FieldConfigPanel field={selectedField} />
-        ) : (
+        ) : ( */}
+        {fields.length === 0 && (
           <Box sx={{ p: 3, border: "1px solid #ccc", borderRadius: 1 }}>
             <Typography
               variant="body1"
               color="text.secondary"
               textAlign="center"
             >
-              Select a field on the left to configure its settings.
+              Selected fields will appear here.
             </Typography>
           </Box>
         )}
-      </Grid>
-    </Grid>
+      </Box>
+    </Stack>
   );
 };
 
