@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { Provider } from "react-redux";
-import { store } from "./store"; // The Redux store you created
+import { store } from "./reduxStore"; // The Redux store you created
 
 import Layout from "./components/Layout";
 import CreateForm from "./pages/CreateForm";
