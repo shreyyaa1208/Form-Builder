@@ -24,6 +24,44 @@ const FieldRenderer: React.FC<FieldRendererProps> = ({
   isSelected,
 }) => {
   const [formValues, setFormValues] = React.useState<Record<string, any>>({});
+  const [errors, setErrors] = React.useState<Record<string, string | null>>({});
+
+  const validateField = (field: FormField, value: string): string | null => {
+    for (const rule of field.validations) {
+      switch (rule.type) {
+        case "minLength":
+          if (value.length < (rule.value as number)) {
+            return `Must be at least ${rule.value} characters`;
+          }
+          break;
+        case "maxLength":
+          if (value.length > (rule.value as number)) {
+            return `Must be no more than ${rule.value} characters`;
+          }
+          break;
+        case "email":
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+            return "Invalid email address";
+          }
+          break;
+        case "password":
+          // Example: at least 1 uppercase, 1 number
+          if (!/(?=.*[A-Z])(?=.*\d).{6,}/.test(value)) {
+            return "Password must contain at least 1 uppercase letter and 1 number";
+          }
+          break;
+        default:
+          break;
+      }
+    }
+    return null;
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setFormValues((prev) => ({ ...prev, [field.id]: value }));
+    setErrors((prev) => ({ ...prev, [field.id]: validateField(field, value) }));
+  };
 
   const renderField = () => {
     switch (field.type) {
@@ -46,10 +84,10 @@ const FieldRenderer: React.FC<FieldRendererProps> = ({
                 (rule) => rule.type === "maxLength"
               )?.value,
             }}
-            onChange={(e) =>
-              setFormValues({ ...formValues, [field.id]: e.target.value })
-            }
+            onChange={handleChange}
             value={formValues[field.id] || ""}
+            error={Boolean(errors[field.id])}
+            helperText={errors[field.id] || ""}
           />
         );
       case "textarea":
